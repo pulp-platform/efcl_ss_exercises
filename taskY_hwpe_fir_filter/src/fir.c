@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-/* 
- * Mantainer: Luca Valente, luca.valente2@unibo.it
- */
 #include <stdio.h>
 #include <stdint.h>
 #include "common.h"
+#include "fir.h"
 
 void fir16(
   const int16_t *arr,
@@ -29,23 +27,21 @@ void fir16(
   unsigned      coeff_len,
   unsigned      right_shift
 ) {
-
+  
+  int offload_id_tmp, offload_id;
 
   // acquire job 
   while((offload_id_tmp = fir_acquire_job()) < 0);
-  
   // job-dependent registers
-  fir_x_addr_set((unsigned int) x_stim);
-  fir_h_addr_set((unsigned int) h_stim);
-  fir_y_addr_set((unsigned int) y_actual);
-  fir_shift_length_set(16, 512); // right_shift, length
+  fir_x_addr_set((unsigned int) /* TASK4: Fill the correct address */);
+  fir_h_addr_set((unsigned int) /* TASK4: Fill the correct address */);
+  fir_y_addr_set((unsigned int) /* TASK4: Fill the correct address */);
+  fir_shift_length_set(right_shift, arr_len); // right_shift, length
 
   // start hwpe operation
   fir_trigger_job();
-
-  // wait for end of computation
-  asm volatile ("wfi" ::: "memory");
-
-
+  
+  // wait for hwpe to finish
+  FIR_BUSYWAIT();
 }
 
